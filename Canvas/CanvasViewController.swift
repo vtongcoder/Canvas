@@ -17,9 +17,10 @@ class CanvasViewController: UIViewController {
   var trayOriginalCenter: CGPoint!
   var trayUpPosition: CGPoint!
   var trayDownPosition: CGPoint!
-  var isMoveUp: Bool = false
+  var isMoveUp: Bool = true
   var isMoveDown: Bool = false
-  
+  var newlyCreatedFace: UIImageView!
+  var imageOriginalCenter: CGPoint!
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,23 +39,41 @@ class CanvasViewController: UIViewController {
   @IBAction func panTrayView(sender: UIPanGestureRecognizer) {
 //    let point = sender.locationInView(view)
     let velocity = sender.velocityInView(view)
-    if sender.state == UIGestureRecognizerState.Began {
+    switch sender.state {
+    case .Began:
       trayOriginalCenter = trayView.center
-    } else if sender.state == UIGestureRecognizerState.Changed {
-//      let translation = sender.translationInView(view)
-//      trayView.center = CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y + translation.y)
+    case .Changed:
       if velocity.y > 0 && !isMoveDown {
-//        trayView.center = CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y + trayView.frame.size.height - 50)
         isMoveDown = true
         isMoveUp  = false
         trayMoveAnimation(false)
         
       } else if velocity.y < 0 && !isMoveUp {
-//        trayView.center = CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y - trayView.frame.size.height + 50)
         isMoveUp = true
         isMoveDown  = false
         trayMoveAnimation(true)
       }
+    default:
+      break
+    }
+   
+  }
+  @IBAction func imgViewPanGesture(sender: UIPanGestureRecognizer) {
+    print("Pan image")
+    switch sender.state {
+    case .Began:
+      let imageView = sender.view as! UIImageView
+      newlyCreatedFace = UIImageView(image: imageView.image)
+      view.addSubview(newlyCreatedFace)
+      newlyCreatedFace.center.x = (trayView.frame.origin.x)
+      newlyCreatedFace.center.y = (trayView.frame.origin.y)
+      imageOriginalCenter = newlyCreatedFace.center
+    case .Changed:
+      let translation = sender.translationInView(view)
+      newlyCreatedFace.center = CGPoint(x: self.imageOriginalCenter.x + translation.x, y: self.imageOriginalCenter.y + translation.y )
+    default:
+      break
+      
     }
   }
   
